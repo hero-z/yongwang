@@ -1,0 +1,115 @@
+
+.main{
+    width: 1200px;
+    min-width: 1200px;
+    height: 1000px;
+    margin: 0 auto;
+    padding-top: 30px;
+    background-color: red;
+}
+.main .title{
+    display: inline-block;
+    background-color: #fff;
+}
+.main .header-block{
+    width: 730px;
+    height: 110px;
+    padding-top: 45px;
+    border-bottom: none;
+}
+.main .search-box{
+    width: 300px;
+    height: 40px;
+    display: inline-block;
+    border:1px solid gray;
+    border-radius: 20px;
+    padding-right: 20px;
+    outline:medium;
+    float: left;
+
+}
+.main .search-box .search{
+    float: right;
+    height: 30px;
+    width: 250px;
+    outline:medium;
+    margin-top: 5px;
+    border:none;
+
+}
+.main .btn{
+    width: 200px;
+    height: 40px;
+    line-height: 40px;
+    display: inline-block;
+    border:1px solid gray;
+    text-align: center;
+    border-radius: 4px;
+    margin-left: 60px;
+    cursor: pointer;
+}
+.main .tree-map{
+    width: 980px;
+    height: 700px;
+    border:1px solid #000;
+}
+
+
+/*添加代理商*/
+.default{
+    font-size: 14px;
+}
+.af-box{
+    width: 1200px;
+    min-width: 1200px;
+    height: 1000px;
+    margin: 0 auto;
+    padding-top: 65px;
+    background-color: #fff;
+    display: none;
+
+}
+.af-box .af-title{
+    display: inline-block;
+    background-color: #fff;
+    border:1px solid #000;
+    border-bottom: none;
+    position: absolute;
+    top: 45px;
+}
+.af-box .af-main{
+    width: 965px;
+    height: 670px;
+    border:1px solid #000;
+    padding-top: 50px;
+    padding-left: 215px;
+}
+.af-main .af-list{
+    margin: 0;
+    padding: 0;
+}
+.af-main .af-list .af-item{
+    list-style-type: none;
+    margin-bottom: 20px;
+}
+.af-item .af-down{
+    width: 150px;
+    height: 25px;
+    position: relative;
+}
+::-webkit-input-placeholder {
+    color:#000;
+}
+.af-box .btn{
+    display: inline-block;
+    width: 70px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    border:1px solid gray;
+    border-radius: 4px;
+    margin-top: 40px;
+    cursor: pointer;
+    margin-right: 20px;
+}
+

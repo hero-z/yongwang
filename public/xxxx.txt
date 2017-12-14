@@ -1,0 +1,13 @@
+/data/wwwroot/isv.nmgywzq.xyz/vendor/laravel/framework/src/Illuminate/Database/Connection.php770SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ') ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='浦发地区--省市区3级'' at line 12 (SQL: CREATE TABLE IF NOT EXISTS `ms_region` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT '银行全称',
+  `code` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT '地区代号',
+  `pid` int(11) NOT NULL DEFAULT '0' COMMENT '上级地区',
+  `level` tinyint(4) NOT NULL DEFAULT '1' COMMENT '第几级，默认1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  key name(name),
+  key level(level),
+  key pid(pid),
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='浦发地区--省市区3级';
+)

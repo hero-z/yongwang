@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>花呗</title>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        a {
+            list-style-type: none;
+        }
+        ul, li {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .main_box{
+            padding:0 0.4rem;
+            background-color: #fff;
+        }
+
+        .center_style {
+            width: 100%;
+            height: 1.2rem;
+            line-height: 1.2rem;
+            color: #333;
+            font-size: 0.4rem;
+            text-align: left;
+
+        }
+        .center_box {
+            border-bottom: 1px solid #e7eaec;
+        }
+        .input_select {
+            background: #fff;
+            height: 100%;
+            float: right;
+            text-align: right;
+            outline: medium;
+            font-size: 0.38rem;
+            color: #333333;
+            width:60%;
+            border:none;
+        }
+        .input {
+            height: 100%;
+            float: right;
+            border: none;
+            width: 70%;
+            text-align: right;
+            outline: medium;
+            font-size: 0.38rem;
+            color: #333333;
+        }
+
+        ::-webkit-input-placeholder {
+            color: #999999;
+            font-size: 0.4rem;
+        }
+
+        .center_style ul {
+            width: 100%;
+            background: #fff;
+            position: absolute;
+            display: none;
+            left: 0;
+            padding:0 25px;
+            border-bottom: 1px solid #ededed;
+        }
+
+        .center_style ul li {
+            height: 1.2rem;
+            line-height: 1.2rem;
+            text-align: center;
+            border-top: 1px solid #ededed;
+        }
+
+        .center_style ul li:first-child {
+            border-top: none;
+        }
+
+        .center_style ul li a {
+            display: block;
+            height: 1.2rem;
+            color: #807a62;
+            text-decoration: none
+        }
+
+        .center_style ul li a:hover {
+            background: #ededed;
+            color: #333;
+        }
+
+        .refund {
+            width: 100%;
+            height: 2.5rem;
+            color: #333;
+            padding: 0.2rem 0;
+            font-size: 0.4rem;
+            background-color: #fff;
+        }
+
+        .refund_list {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            line-height: 1.5;
+            margin-top:0.3rem;
+        }
+
+        .refund_list > li {
+            margin-right: 0.5rem;
+            color: #333;
+            font-size: 0.4rem;
+        }
+
+
+        .btn {
+            display: inline-block;
+            width: 90%;
+            height: 1rem;
+            line-height: 1rem;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.45rem;
+            color: #f5f5f5;
+            margin:20% 0 0 5%;
+            background-color: #00aaef;
+
+        }
+
+
+
+
+        /*弹出层*/
+        .mark {
+            width: 105%;
+            height: 105%;
+            top: 0;
+            background-color: #333;
+            position: absolute;
+            z-index: 99;
+            display: none;
+            opacity: 0.6;
+        }
+
+        .er_code {
+            width: 70%;
+            height: 30%;
+            background-color: #fff;
+            border-radius: 5px;
+            position: absolute;
+            left: 15%;
+            top: 25%;
+            z-index: 100;
+            display: none;
+
+        }
+
+
+    </style>
+
+</head>
+<body>
+
+
+<div class="main_box">
+    <div class="main_center">
+        <div class="center_box" style="text-align: center;height: 150px;padding-top: 30px">
+            <img src="images/logo.jpg" alt="" style="width: 100px;height: 100px;">
+        </div>
+        <div class="center_box center_style" style="padding-right:25px;">
+            选择支付类型：
+            <input class="input_select1 input_select" type="text" placeholder="请选择支付类型"/>
+            <ul class="ul_list1">
+                <li><a href="#">支付宝当面付</a></li>
+                <li><a href="#">支付口碑</a></li>
+            </ul>
+        </div>
+        <div class="center_box center_style">
+            金额：
+            <input class="input money" type="text" placeholder="请输入金额">
+
+        </div>
+        <div class="center_box center_style" style="padding-right:25px;">
+            分期数：
+            <input class="input_select input_select2" type="text" placeholder="请选择分期数"/>
+            <ul class="ul_list2">
+                <li><a href="#">3期</a></li>
+                <li><a href="#">6期</a></li>
+                <li><a href="#">12期</a></li>
+            </ul>
+        </div>
+        <div class="center_box center_style" style="padding-right:25px;">
+            手续费承担方：
+            <input class="input_select input_select3" type="text" placeholder="请选择手续费承担方"/>
+            <ul class="ul_list3">
+                <li><a href="#">商户</a></li>
+                <li><a href="#">顾客</a></li>
+            </ul>
+        </div>
+        <div class="refund">
+            <div class="refund_title">还款测算</div>
+            <ul class="refund_list">
+                <li>
+                    <div>每期还款(元)</div>
+                    <div class="terminally">--</div>
+                </li>
+                <li>
+                    <div>X</div>
+                    <div></div>
+                </li>
+                <li>
+                    <div>期数</div>
+                    <div class="periods">--</div>
+                </li>
+                <li>
+                    <div>=</div>
+                    <div></div>
+                </li>
+                <li>
+                    <div>总价(元)</div>
+                    <div id="allMoney">--</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+    <span class="btn">确定</span>
+
+    <div class="mark">
+    </div>
+    <div class="er_code"></div>
+</div>
+
+
+<script src="https://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
+<script src="js/index.js"></script>
+
+</body>
+</html>
+
+
+
+
+
+
