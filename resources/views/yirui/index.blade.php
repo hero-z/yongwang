@@ -7,7 +7,7 @@
         <div id="tipshow">
             <h3>盒子使用步骤：</h3>
             <p>1.后台配置好店铺并绑定收银员</p>
-            <p>2.配置盒子被扫地址并生成链接二维码(InspirySpUrlDecode:{{url('api/merchant/init')}})拿到机器上扫一下。</p>
+            <p>2.配置盒子被扫地址并生成链接二维码(InspirySpUrlDecode:{{url('api/bestpay/init')}})拿到机器上扫一下。</p>
             <p>3.配置盒子通信密码并生成二维码(InspirySpKey:88888)拿到机器上扫一下。</p>
             <p>4.重启盒子，即可！(以上地址生成工具：http://cli.im/)</p>
             <p>5.可能用到的参数,操作步骤参考1-4！
