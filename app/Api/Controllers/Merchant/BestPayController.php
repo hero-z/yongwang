@@ -100,7 +100,7 @@ class BestPayController
                                                 try{
                                                     $istdata=[
                                                         'admin_id'=>$bstore->admin_id,
-                                                        'merchant_id'=>$bstore->merchant_id,
+                                                        'merchant_id'=>$device->m_id,
                                                         'store_id'=>$bstore->store_id,
                                                         'device_no'=>$device_no,
                                                         'trade_no'=>$result['ourTransNo'],
