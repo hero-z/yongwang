@@ -15,6 +15,7 @@ use App\Merchant;
 use App\Models\BestPayStore;
 use App\Models\Bill;
 use App\Models\MerchantPayWay;
+use App\Models\MerchantShops;
 use App\Models\Paipai;
 use EasyWeChat\Support\Arr;
 use Illuminate\Http\Request;
@@ -70,78 +71,80 @@ class BestPayController
                     if($codehead=='51'){
                         if($mpayway->bestpay=='bestpay'){
 //                        if($mpayway==1){
-                            //官方翼支付
-                            $bstore=BestPayStore::where('merchant_id',$device->m_id)->first();
-                            if($bstore){
-                                $payparams=[];
-                                $payparams['merchantId']=$bstore->merchantId;
+                            //商户通道信息
+                            $mshops=MerchantShops::where('merchant_id',$device->m_id)->where('store_type','bestpay')->first();
+                            if($mshops){
+                                $bstore=BestPayStore::where('store_id',$mshops->store_id)->first();
+                                if($bstore){
+                                    $payparams=[];
+                                    $payparams['merchantId']=$bstore->merchantId;
 //                                $payparams['subMerchantId']='02150108040601368';
-                                $payparams['barcode']=$auth_code;
-                                $payparams['storeId']=$bstore->store_id;
-                                $payparams['orderAmt']=$total_fee;
-                                $payparams['orderNo']='mb'.date('YmdHis').rand(10000000,99999999);
-                                $payparams['orderReqNo']='mq'.date('YmdHis').rand(10000000,99999999);
-                                $payparams['orderDate']=date('YmdHis');
-                                $key=$bstore->data_key;
-                                $pay_key=$bstore->pay_key;
-                                //下单
-                                $res=self::best_pay($payparams,$key);
+                                    $payparams['barcode']=$auth_code;
+                                    $payparams['storeId']=$bstore->store_id;
+                                    $payparams['orderAmt']=$total_fee;
+                                    $payparams['orderNo']='mb'.date('YmdHis').rand(10000000,99999999);
+                                    $payparams['orderReqNo']='mq'.date('YmdHis').rand(10000000,99999999);
+                                    $payparams['orderDate']=date('YmdHis');
+                                    $key=$bstore->data_key;
+                                    $pay_key=$bstore->pay_key;
+                                    //下单
+                                    $res=self::best_pay($payparams,$key);
 //                                Log::info($res);
-                                if($res['success']){
-                                    //交易请求成功
-                                    if($res['data']['success']){
-                                        //交易下单成功
-                                        $result=$res['data']['result'];
-                                        if(self::checkBestPaySign($result,$key)){
-                                            //验签成功
-                                            try{
-                                                $istdata=[
-                                                    'admin_id'=>$bstore->admin_id,
-                                                    'merchant_id'=>$bstore->merchant_id,
-                                                    'store_id'=>$bstore->store_id,
-                                                    'device_no'=>$device_no,
-                                                    'trade_no'=>$result['ourTransNo'],
-                                                    'trade_req_no'=>$payparams['orderReqNo'],
-                                                    'out_trade_no'=>$payparams['orderNo'],
-                                                    'type'=>'101',
-                                                    'total_amount'=>$total_fee/100,
-                                                    'receipt_amount'=>$total_fee/100,
-                                                    'pay_amount'=>$total_fee/100,
-                                                    'invoice_amount'=>$total_fee/100,
-                                                    'trade_status'=>$result['transStatus'],
-                                                    'pay_status'=>2,
-                                                ];
-                                                $createbill=Bill::create($istdata);
-                                                $merchant=Merchant::find($device->m_id);
-                                                if($result['transStatus']=='B'){
-                                                    //交易成功
-                                                    $createbill->update(['pay_status'=>1]);
-                                                    $printstr=
-                                                        "--------------顾客联-----------\r\n"
-                                                        ."商户名称:".$bstore->alias_name."\r\n"
-                                                        ."商 户 号:".$result['merchantId']."\r\n"
-                                                        ."款台编号:".$merchant->name."(".$merchant->id.")\r\n"
-                                                        ."订 单 号:".$result['ourTransNo']."\r\n"
-                                                        ."支付方式:"."翼支付"."\r\n"
-                                                        ."交易金额:".($result['transAmt']/100)."元\r\n"
-                                                        ."时    间:".$payparams['orderDate']."\r\n"
-                                                        ."交易手机号:".$result['transPhone']."\r\n\r\n"
-                                                        ."--------------商户联-----------\r\n"
-                                                        ."商户名称:".$bstore->alias_name."\r\n"
-                                                        ."商 户 号:".$result['merchantId']."\r\n"
-                                                        ."款台编号:".$merchant->name."(".$merchant->id.")\r\n"
-                                                        ."订 单 号:".$result['ourTransNo']."\r\n"
-                                                        ."支付方式:"."翼支付"."\r\n"
-                                                        ."交易金额:".($result['transAmt']/100)."元\r\n"
-                                                        ."时    间:".$payparams['orderDate']."\r\n"
-                                                        ."交易手机号:".$result['transPhone']."\r\n\r\n"
-                                                        ."------------------------------\r\n"
-                                                        ."备    注:"."\r\n"
-                                                        ."------------------------------\r\n"
-                                                        ."持卡人签名:"."\r\n\r\n\r\n"
-                                                        ."本人确认以上交易,同意计入本主账号";
-                                                    $encode = mb_detect_encoding($printstr, array('ASCII','GB2312','GBK','UTF-8'));
-                                                    $str_encode = mb_convert_encoding($printstr, 'GBK', $encode);
+                                    if($res['success']){
+                                        //交易请求成功
+                                        if($res['data']['success']){
+                                            //交易下单成功
+                                            $result=$res['data']['result'];
+                                            if(self::checkBestPaySign($result,$key)){
+                                                //验签成功
+                                                try{
+                                                    $istdata=[
+                                                        'admin_id'=>$bstore->admin_id,
+                                                        'merchant_id'=>$bstore->merchant_id,
+                                                        'store_id'=>$bstore->store_id,
+                                                        'device_no'=>$device_no,
+                                                        'trade_no'=>$result['ourTransNo'],
+                                                        'trade_req_no'=>$payparams['orderReqNo'],
+                                                        'out_trade_no'=>$payparams['orderNo'],
+                                                        'type'=>'101',
+                                                        'total_amount'=>$total_fee/100,
+                                                        'receipt_amount'=>$total_fee/100,
+                                                        'pay_amount'=>$total_fee/100,
+                                                        'invoice_amount'=>$total_fee/100,
+                                                        'trade_status'=>$result['transStatus'],
+                                                        'pay_status'=>2,
+                                                    ];
+                                                    $createbill=Bill::create($istdata);
+                                                    $merchant=Merchant::find($device->m_id);
+                                                    if($result['transStatus']=='B'){
+                                                        //交易成功
+                                                        $createbill->update(['pay_status'=>1]);
+                                                        $printstr=
+                                                            "--------------顾客联-----------\r\n"
+                                                            ."商户名称:".$bstore->alias_name."\r\n"
+                                                            ."商 户 号:".$result['merchantId']."\r\n"
+                                                            ."款台编号:".$merchant->name."(".$merchant->id.")\r\n"
+                                                            ."订 单 号:".$result['ourTransNo']."\r\n"
+                                                            ."支付方式:"."翼支付"."\r\n"
+                                                            ."交易金额:".($result['transAmt']/100)."元\r\n"
+                                                            ."时    间:".$payparams['orderDate']."\r\n"
+                                                            ."交易手机号:".$result['transPhone']."\r\n\r\n"
+                                                            ."--------------商户联-----------\r\n"
+                                                            ."商户名称:".$bstore->alias_name."\r\n"
+                                                            ."商 户 号:".$result['merchantId']."\r\n"
+                                                            ."款台编号:".$merchant->name."(".$merchant->id.")\r\n"
+                                                            ."订 单 号:".$result['ourTransNo']."\r\n"
+                                                            ."支付方式:"."翼支付"."\r\n"
+                                                            ."交易金额:".($result['transAmt']/100)."元\r\n"
+                                                            ."时    间:".$payparams['orderDate']."\r\n"
+                                                            ."交易手机号:".$result['transPhone']."\r\n\r\n"
+                                                            ."------------------------------\r\n"
+                                                            ."备    注:"."\r\n"
+                                                            ."------------------------------\r\n"
+                                                            ."持卡人签名:"."\r\n\r\n\r\n"
+                                                            ."本人确认以上交易,同意计入本主账号";
+                                                        $encode = mb_detect_encoding($printstr, array('ASCII','GB2312','GBK','UTF-8'));
+                                                        $str_encode = mb_convert_encoding($printstr, 'GBK', $encode);
 //                                                    Log::info([
 //                                                        'code' => "SUCCESS",
 //                                                        'msg'=>'您已经成功付款',
@@ -152,16 +155,16 @@ class BestPayController
 //                                                        'pay_type'=>'bestpay',
 //                                                        'printType'=>'2',
 //                                                        'receipt'=>base64_encode($str_encode)]);
-                                                    return json_encode([
-                                                        'code' => "SUCCESS",
-                                                        'msg'=>'您已经成功付款',
-                                                        'pp_trade_no'=>$cin['pp_trade_no'],//扫码设备号
-                                                        'transaction_id'=>$result['ourTransNo'],//三方交易号
-                                                        'total_fee'=>$cin['total_fee'],//实际支付金额，非订单金额
-                                                        'time_end'=>$payparams['orderDate'],
-                                                        'pay_type'=>'bestpay',
-                                                        'printType'=>'2',
-                                                        'receipt'=>base64_encode($str_encode)]);
+                                                        return json_encode([
+                                                            'code' => "SUCCESS",
+                                                            'msg'=>'您已经成功付款',
+                                                            'pp_trade_no'=>$cin['pp_trade_no'],//扫码设备号
+                                                            'transaction_id'=>$result['ourTransNo'],//三方交易号
+                                                            'total_fee'=>$cin['total_fee'],//实际支付金额，非订单金额
+                                                            'time_end'=>$payparams['orderDate'],
+                                                            'pay_type'=>'bestpay',
+                                                            'printType'=>'2',
+                                                            'receipt'=>base64_encode($str_encode)]);
 //                                        array (
 //                                            'success' => true,
 //                                            'result' =>
@@ -193,22 +196,22 @@ class BestPayController
 //                                            'errorCode' => NULL,
 //                                            'errorMsg' => NULL,
 //                                        );
-                                                }elseif($result['transStatus']=='A'){
-                                                    //请求中
-                                                    Log::info('等待支付');
-                                                    $createbill->update(['pay_status'=>2]);
-                                                    $queryarray=array_except($payparams,['barcode','storeId','orderAmt']);
-                                                    $limit=15;//15秒等待时间
-                                                    for($i=0;$i<$limit;$i++){
-                                                        $queryresult=self::best_pay_query($queryarray,$key);
-                                                        Log::info($queryresult);
-                                                        if($queryresult['success']){
-                                                            if($queryresult['data']['success']){
-                                                                $queryresultdata=$queryresult['data']['result'];
-                                                                if(self::checkBestPaySign($queryresultdata,$key)){
-                                                                    if($queryresultdata['transStatus']=='B'){
-                                                                        $createbill->update(['pay_status'=>1]);
-                                                                        //支付成功
+                                                    }elseif($result['transStatus']=='A'){
+                                                        //请求中
+                                                        Log::info('等待支付');
+                                                        $createbill->update(['pay_status'=>2]);
+                                                        $queryarray=array_except($payparams,['barcode','storeId','orderAmt']);
+                                                        $limit=15;//15秒等待时间
+                                                        for($i=0;$i<$limit;$i++){
+                                                            $queryresult=self::best_pay_query($queryarray,$key);
+                                                            Log::info($queryresult);
+                                                            if($queryresult['success']){
+                                                                if($queryresult['data']['success']){
+                                                                    $queryresultdata=$queryresult['data']['result'];
+                                                                    if(self::checkBestPaySign($queryresultdata,$key)){
+                                                                        if($queryresultdata['transStatus']=='B'){
+                                                                            $createbill->update(['pay_status'=>1]);
+                                                                            //支付成功
 //                                                            array (
 //                                                                'success' => true,
 //                                                                'result' =>
@@ -238,32 +241,32 @@ class BestPayController
 //                                                                'errorCode' => NULL,
 //                                                                'errorMsg' => NULL,
 //                                                            );
-                                                                        $printstr=
-                                                                            "--------------顾客联-----------\r\n"
-                                                                            ."商户名称:".$bstore->alias_name."\r\n"
-                                                                            ."商 户 号:".$queryresultdata['merchantId']."\r\n"
-                                                                            ."款台编号:".$merchant->name."(".$merchant->id.")\r\n"
-                                                                            ."订 单 号:".$queryresultdata['ourTransNo']."\r\n"
-                                                                            ."支付方式:"."翼支付"."\r\n"
-                                                                            ."交易金额:".($queryresultdata['transAmt']/100)."元\r\n"
-                                                                            ."时    间:".$queryresultdata['orderDate']."\r\n"
-                                                                            ."交易手机号:".$queryresultdata['customerId']."\r\n\r\n"
-                                                                            ."--------------商户联-----------\r\n"
-                                                                            ."商户名称:".$bstore->alias_name."\r\n"
-                                                                            ."商 户 号:".$queryresultdata['merchantId']."\r\n"
-                                                                            ."款台编号:".$merchant->name."(".$merchant->id.")\r\n"
-                                                                            ."订 单 号:".$queryresultdata['ourTransNo']."\r\n"
-                                                                            ."支付方式:"."翼支付"."\r\n"
-                                                                            ."交易金额:".($queryresultdata['transAmt']/100)."元\r\n"
-                                                                            ."时    间:".$queryresultdata['orderDate']."\r\n"
-                                                                            ."交易手机号:".$queryresultdata['customerId']."\r\n\r\n"
-                                                                            ."------------------------------\r\n"
-                                                                            ."备    注:"."\r\n"
-                                                                            ."------------------------------\r\n"
-                                                                            ."持卡人签名:"."\r\n\r\n\r\n"
-                                                                            ."本人确认以上交易,同意计入本主账号";
-                                                                        $encode = mb_detect_encoding($printstr, array('ASCII','GB2312','GBK','UTF-8'));
-                                                                        $str_encode = mb_convert_encoding($printstr, 'GBK', $encode);
+                                                                            $printstr=
+                                                                                "--------------顾客联-----------\r\n"
+                                                                                ."商户名称:".$bstore->alias_name."\r\n"
+                                                                                ."商 户 号:".$queryresultdata['merchantId']."\r\n"
+                                                                                ."款台编号:".$merchant->name."(".$merchant->id.")\r\n"
+                                                                                ."订 单 号:".$queryresultdata['ourTransNo']."\r\n"
+                                                                                ."支付方式:"."翼支付"."\r\n"
+                                                                                ."交易金额:".($queryresultdata['transAmt']/100)."元\r\n"
+                                                                                ."时    间:".$queryresultdata['orderDate']."\r\n"
+                                                                                ."交易手机号:".$queryresultdata['customerId']."\r\n\r\n"
+                                                                                ."--------------商户联-----------\r\n"
+                                                                                ."商户名称:".$bstore->alias_name."\r\n"
+                                                                                ."商 户 号:".$queryresultdata['merchantId']."\r\n"
+                                                                                ."款台编号:".$merchant->name."(".$merchant->id.")\r\n"
+                                                                                ."订 单 号:".$queryresultdata['ourTransNo']."\r\n"
+                                                                                ."支付方式:"."翼支付"."\r\n"
+                                                                                ."交易金额:".($queryresultdata['transAmt']/100)."元\r\n"
+                                                                                ."时    间:".$queryresultdata['orderDate']."\r\n"
+                                                                                ."交易手机号:".$queryresultdata['customerId']."\r\n\r\n"
+                                                                                ."------------------------------\r\n"
+                                                                                ."备    注:"."\r\n"
+                                                                                ."------------------------------\r\n"
+                                                                                ."持卡人签名:"."\r\n\r\n\r\n"
+                                                                                ."本人确认以上交易,同意计入本主账号";
+                                                                            $encode = mb_detect_encoding($printstr, array('ASCII','GB2312','GBK','UTF-8'));
+                                                                            $str_encode = mb_convert_encoding($printstr, 'GBK', $encode);
 //                                                                        Log::info([
 //                                                                            'code' => "SUCCESS",
 //                                                                            'msg'=>'您已经成功付款',
@@ -274,118 +277,123 @@ class BestPayController
 //                                                                            'pay_type'=>'bestpay',
 //                                                                            'printType'=>'2',
 //                                                                            'receipt'=>base64_encode($str_encode)]);
-                                                                        return json_encode([
-                                                                            'code' => "SUCCESS",
-                                                                            'msg'=>'您已经成功付款',
-                                                                            'pp_trade_no'=>$cin['pp_trade_no'],//扫码设备号
-                                                                            'transaction_id'=>$result['ourTransNo'],//三方交易号
-                                                                            'total_fee'=>$cin['total_fee'],//实际支付金额，非订单金额
-                                                                            'time_end'=>$payparams['orderDate'],
-                                                                            'pay_type'=>'bestpay',
-                                                                            'printType'=>'2',
-                                                                            'receipt'=>base64_encode($str_encode)]);
-                                                                    }elseif($queryresultdata['transStatus']=='A'){
-                                                                        //等待付款
-                                                                        if($i==$limit-1){
-                                                                            //最后一次
-                                                                            $createbill->update(['pay_status'=>5]);
-                                                                            $correctparams['merchantId']=$payparams['merchantId'];
-                                                                            $correctparams['oldOrderNo']=$payparams['orderNo'];
-                                                                            $correctparams['oldOrderReqNo']=$payparams['orderReqNo'];
-                                                                            $correctparams['refundReqNo']='mc'.date('YmdHis').rand(10000000,99999999);
-                                                                            $correctparams['refundReqDate']=$payparams['orderDate'];
-                                                                            $correctparams['transAmt']=$payparams['orderAmt'];
-                                                                            $correctresult=self::best_pay_correct($correctparams,$pay_key,$key);
-                                                                            Log::info('关闭交易');
-                                                                            Log::info($correctresult);
+                                                                            return json_encode([
+                                                                                'code' => "SUCCESS",
+                                                                                'msg'=>'您已经成功付款',
+                                                                                'pp_trade_no'=>$cin['pp_trade_no'],//扫码设备号
+                                                                                'transaction_id'=>$result['ourTransNo'],//三方交易号
+                                                                                'total_fee'=>$cin['total_fee'],//实际支付金额，非订单金额
+                                                                                'time_end'=>$payparams['orderDate'],
+                                                                                'pay_type'=>'bestpay',
+                                                                                'printType'=>'2',
+                                                                                'receipt'=>base64_encode($str_encode)]);
+                                                                        }elseif($queryresultdata['transStatus']=='A'){
+                                                                            //等待付款
+                                                                            if($i==$limit-1){
+                                                                                //最后一次
+                                                                                $createbill->update(['pay_status'=>5]);
+                                                                                $correctparams['merchantId']=$payparams['merchantId'];
+                                                                                $correctparams['oldOrderNo']=$payparams['orderNo'];
+                                                                                $correctparams['oldOrderReqNo']=$payparams['orderReqNo'];
+                                                                                $correctparams['refundReqNo']='mc'.date('YmdHis').rand(10000000,99999999);
+                                                                                $correctparams['refundReqDate']=$payparams['orderDate'];
+                                                                                $correctparams['transAmt']=$payparams['orderAmt'];
+                                                                                $correctresult=self::best_pay_correct($correctparams,$pay_key,$key);
+                                                                                Log::info('关闭交易');
+                                                                                Log::info($correctresult);
+                                                                                $sub_code='SYSTEMERROR';
+                                                                                $sub_msg='用户支付超时,关闭交易!';
+                                                                                $msg='用户支付超时,关闭交易!';
+                                                                                break;
+                                                                            }else{
+                                                                                sleep(1);
+                                                                            }
+                                                                        }elseif($result['transStatus']=='C'){
+                                                                            //失败
+                                                                            $createbill->update(['pay_status'=>3]);
                                                                             $sub_code='SYSTEMERROR';
-                                                                            $sub_msg='用户支付超时,关闭交易!';
-                                                                            $msg='用户支付超时,关闭交易!';
+                                                                            $sub_msg='订单查询:支付结果失败!';
+                                                                            $msg='订单查询:支付结果失败!';
+                                                                            break;
+                                                                        }elseif($result['transStatus']=='G'){
+                                                                            //订单作废
+                                                                            $createbill->update(['pay_status'=>4]);
+                                                                            $sub_code='ORDERCLOSED';
+                                                                            $sub_msg='订单查询:订单作废!';
+                                                                            $msg='订单查询:订单作废!';
                                                                             break;
                                                                         }else{
-                                                                            sleep(1);
+                                                                            //未知交易标识
+                                                                            //失败
+                                                                            $sub_code='SYSTEMERROR';
+                                                                            $sub_msg='订单查询:未知交易标识,支付结果失败!';
+                                                                            $msg='订单查询:未知交易标识,支付结果失败!';
+                                                                            break;
                                                                         }
-                                                                    }elseif($result['transStatus']=='C'){
-                                                                        //失败
-                                                                        $createbill->update(['pay_status'=>3]);
-                                                                        $sub_code='SYSTEMERROR';
-                                                                        $sub_msg='订单查询:支付结果失败!';
-                                                                        $msg='订单查询:支付结果失败!';
-                                                                        break;
-                                                                    }elseif($result['transStatus']=='G'){
-                                                                        //订单作废
-                                                                        $createbill->update(['pay_status'=>4]);
-                                                                        $sub_code='ORDERCLOSED';
-                                                                        $sub_msg='订单查询:订单作废!';
-                                                                        $msg='订单查询:订单作废!';
-                                                                        break;
                                                                     }else{
-                                                                        //未知交易标识
-                                                                        //失败
-                                                                        $sub_code='SYSTEMERROR';
-                                                                        $sub_msg='订单查询:未知交易标识,支付结果失败!';
-                                                                        $msg='订单查询:未知交易标识,支付结果失败!';
+                                                                        $sub_code='SIGNERROR';
+                                                                        $sub_msg='查询结果验签失败!';
+                                                                        $msg='查询结果验签失败!';
                                                                         break;
                                                                     }
                                                                 }else{
-                                                                    $sub_code='SIGNERROR';
-                                                                    $sub_msg='查询结果验签失败!';
-                                                                    $msg='查询结果验签失败!';
+                                                                    $sub_code='SYSTEMERROR';
+                                                                    $sub_msg='支付结果失败!';
+                                                                    $msg='支付结果失败!';
                                                                     break;
                                                                 }
                                                             }else{
                                                                 $sub_code='SYSTEMERROR';
-                                                                $sub_msg='支付结果失败!';
-                                                                $msg='支付结果失败!';
+                                                                $sub_msg='支付结果查询失败!'.$queryresult['msg'];
+                                                                $msg='支付结果查询失败!'.$queryresult['msg'];
                                                                 break;
                                                             }
-                                                        }else{
-                                                            $sub_code='SYSTEMERROR';
-                                                            $sub_msg='支付结果查询失败!'.$queryresult['msg'];
-                                                            $msg='支付结果查询失败!'.$queryresult['msg'];
-                                                            break;
                                                         }
+                                                    }elseif($result['transStatus']=='C'){
+                                                        //失败
+                                                        $sub_code='SYSTEMERROR';
+                                                        $sub_msg='支付结果失败!';
+                                                        $msg='支付结果失败!';
+                                                    }elseif($result['transStatus']=='G'){
+                                                        //订单作废
+                                                        $sub_code='ORDERCLOSED';
+                                                        $sub_msg='订单作废!';
+                                                        $msg='订单作废!';
+                                                    }else{
+                                                        //未知交易标识
+                                                        //失败
+                                                        $sub_code='SYSTEMERROR';
+                                                        $sub_msg='支付结果失败!';
+                                                        $msg='支付结果失败!';
                                                     }
-                                                }elseif($result['transStatus']=='C'){
-                                                    //失败
-                                                    $sub_code='SYSTEMERROR';
-                                                    $sub_msg='支付结果失败!';
-                                                    $msg='支付结果失败!';
-                                                }elseif($result['transStatus']=='G'){
-                                                    //订单作废
-                                                    $sub_code='ORDERCLOSED';
-                                                    $sub_msg='订单作废!';
-                                                    $msg='订单作废!';
-                                                }else{
-                                                    //未知交易标识
-                                                    //失败
-                                                    $sub_code='SYSTEMERROR';
-                                                    $sub_msg='支付结果失败!';
-                                                    $msg='支付结果失败!';
+                                                }catch (\Exception $e){
+                                                    file_put_contents(storage_path().'/logs/bestpay_createbill.txt', var_export($createbill,true) ,FILE_APPEND);
+                                                    file_put_contents(storage_path().'/logs/bestpay_errorbill.txt', $e->getMessage().$e->getLine().'/r/n' ,FILE_APPEND);
                                                 }
-                                            }catch (\Exception $e){
-                                                file_put_contents(storage_path().'/logs/bestpay_createbill.txt', var_export($createbill,true) ,FILE_APPEND);
-                                                file_put_contents(storage_path().'/logs/bestpay_errorbill.txt', $e->getMessage().$e->getLine().'/r/n' ,FILE_APPEND);
+                                            }else{
+                                                $sub_code='SIGNERROR';
+                                                $sub_msg='支付结果验签失败!';
+                                                $msg='支付结果验签失败!';
                                             }
                                         }else{
-                                            $sub_code='SIGNERROR';
-                                            $sub_msg='支付结果验签失败!';
-                                            $msg='支付结果验签失败!';
+                                            $sub_code='SYSTEMERROR';
+                                            $sub_msg='支付失败!'.$res['data']['errorMsg'];
+                                            $msg='支付失败!'.$res['data']['errorMsg'];
                                         }
                                     }else{
-                                        $sub_code='SYSTEMERROR';
-                                        $sub_msg='支付失败!'.$res['data']['errorMsg'];
-                                        $msg='支付失败!'.$res['data']['errorMsg'];
+                                        $sub_code='REQUESTERROR';
+                                        $sub_msg='支付请求失败!'.$res['msg'];
+                                        $msg='支付请求失败!'.$res['msg'];
                                     }
                                 }else{
-                                    $sub_code='REQUESTERROR';
-                                    $sub_msg='支付请求失败!'.$res['msg'];
-                                    $msg='支付请求失败!'.$res['msg'];
+                                    $sub_code='INVALID_PARAMETER';
+                                    $sub_msg='未查询到翼支付通道!';
+                                    $msg='未查询到翼支付通道!';
                                 }
                             }else{
                                 $sub_code='INVALID_PARAMETER';
-                                $sub_msg='未查询到翼支付通道!';
-                                $msg='未查询到翼支付通道!';
+                                $sub_msg='商户不存在翼支付通道!';
+                                $msg='商户不存在翼支付通道!';
                             }
                         }elseif(/*$mpayway==2*/$mpayway->bestpay=='pingan'){
                             //平安翼支付

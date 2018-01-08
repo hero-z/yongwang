@@ -85,12 +85,6 @@ class MerchantManageController extends Controller
                 $users[$user->id]=$user->name;
             }else{
                 $users=[$user->id=>$user->name];
-                if(!$merchant_id){
-                    $merchant_id=$user->id;
-                }
-            }
-            if($merchant_id){
-                $where[]=['bills.merchant_id',$merchant_id];
             }
             $devices=Paipai::whereIn('m_id',array_keys($users))->pluck('name','device_no')->toArray();
             if($device_no){
@@ -154,7 +148,19 @@ class MerchantManageController extends Controller
             if($paytype){
                 $where[]=['bills.type',$paytype];
             }
-            $collect=Bill::where($where);
+            $collect=Bill::where($where)->when(1,function ($query)use($merchant_id,$user,$users){
+                if($merchant_id){
+                    return $query->where('merchant_id',$merchant_id);
+                }else{
+                    if($user->pid==0&&!empty($merchantids)){
+                        $merchantids=array_keys($users);
+                        $merchantids[]=$user->id;
+                        return $query->whereIn('merchant_id',$merchantids);
+                    }else{
+                        return $query->where('merchant_id',$user->id);
+                    }
+                }
+            });
             if($export){
                 try{
                     $merchantinfos=Merchant::pluck('name','id')->toArray();
