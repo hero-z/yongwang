@@ -152,7 +152,7 @@ class MerchantManageController extends Controller
                 if($merchant_id){
                     return $query->where('merchant_id',$merchant_id);
                 }else{
-                    if($user->pid==0&&!empty($merchantids)){
+                    if($user->pid==0&&!empty($users)){
                         $merchantids=array_keys($users);
                         $merchantids[]=$user->id;
                         return $query->whereIn('merchant_id',$merchantids);
@@ -182,7 +182,7 @@ class MerchantManageController extends Controller
                             $body[]=[
                                 $v->store_id,
                                 $merchantstr.'/'.$v->merchant_id,
-                                $v->device_no,
+                                $v->device_no.' ',
                                 $v->out_trade_no,
                                 $v->trade_no,
                                 $v->total_amount,
@@ -199,6 +199,20 @@ class MerchantManageController extends Controller
                     Excel::create(iconv('utf-8','gbk',date('Y-m-d日').'账单统计'),function($excel) use ($cellData){
                         $excel->sheet('score', function($sheet) use ($cellData){
                             $sheet->rows($cellData);
+                            $sheet->setWidth(array(
+                                'A'     =>  40,
+                                'B'     =>  60,
+                                "C"     =>  60,
+                                "D"     =>  80,
+                                "E"     =>  80,
+                                "F"     =>  30,
+                                "G"     =>  30,
+                                "H"     =>  40,
+                                "I"     =>  30,
+                                "J"     =>  50,
+                                "K"     =>  30,
+                                "L"     =>  50,
+                            ));
                         });
                     })->export('xls');
                 }catch (\Exception $e){
