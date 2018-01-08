@@ -16,7 +16,7 @@
                                     <option value="">请选择收款通道</option>
                                     @if($merchant)
                                         @foreach($merchant as $v)
-                                            @if($v['store_type']!='weixin')
+                                            @if($v['store_type']!='weixin'&&$v['store_type']!='bestpay')
                                                 <option value="{{$v['store_type']}}" @if($m&&$m[0]['alipay']==$v['store_type']) selected @endif >{{$v['desc_pay']}}</option>
                                             @endif
                                         @endforeach
@@ -31,7 +31,7 @@
                                     <option value="">请选择收款通道</option>
                                     @if($merchant)
                                         @foreach($merchant as $v)
-                                            @if($v['store_type']!=='oalipay'&&$v['store_type']!=='salipay')
+                                            @if($v['store_type']!=='oalipay'&&$v['store_type']!=='salipay'&&$v['store_type']!='bestpay')
                                                 <option value="{{$v['store_type']}}" @if($m&&$m[0]['weixin']==$v['store_type']) selected @endif >{{$v['desc_pay']}}</option>
                                             @endif
                                         @endforeach
@@ -46,8 +46,23 @@
                                     <option value="">请选择收款通道</option>
                                     @if($merchant)
                                         @foreach($merchant as $v)
-                                            @if($v['store_type']=='pingan')
+                                            @if($v['store_type']=='pingan'&&$v['store_type']!='bestpay')
                                                 <option value="{{$v['store_type']}}" @if($m&&$m[0]['jd']==$v['store_type']) selected @endif >{{$v['desc_pay']}}</option>
+                                            @endif
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
+                        <div class="am-form-group">
+                            <label for="user-phone" class="am-u-sm-3 am-form-label">翼支付通道</label>
+                            <div class="am-u-sm-9">
+                                <select data-am-selected="{searchBox: 3}" id="bestpay" style="display: none;">
+                                    <option value="">请选择收款通道</option>
+                                    @if($merchant)
+                                        @foreach($merchant as $v)
+                                            @if($v['store_type']=='pingan'||$v['store_type']=='bestpay')
+                                                <option value="{{$v['store_type']}}" @if($m&&$m[0]['bestpay']==$v['store_type']) selected @endif >{{$v['desc_pay']}}</option>
                                             @endif
                                         @endforeach
                                     @endif
@@ -72,6 +87,7 @@
                         weixin: $("#weixin").val(),
                         alipay: $("#alipay").val(),
                         jd: $("#jd").val(),
+                        bestpay: $("#bestpay").val(),
                         _token: "{{csrf_token()}}"
                     },
                     function (data) {

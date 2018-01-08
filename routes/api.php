@@ -98,5 +98,11 @@ $api->version('v1', function ($api) {
     $api->group(['namespace' => 'App\Api\Controllers\Merchant', 'prefix' => 'merchant','middleware' => [/*'jwt.auth', 'jwt.refresh','auth:merchantApi'*/'merchant.api']], function ($api) {
         $api->any('newlandCreateOrder', 'NewLandController@newlandCreateOrder');
     });
-
+    //翼支付意锐
+    $api->group(['namespace' => 'App\Api\Controllers\Merchant', 'prefix' => 'bestpay'], function ($api) {
+        //意锐
+        $api->any('test', 'BestPayController@test');
+        $api->any('init', 'BestPayController@init');
+        $api->any('inUnified', 'BestPayController@inUnified');
+    });
 });

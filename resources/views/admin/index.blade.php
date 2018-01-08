@@ -38,6 +38,9 @@
                         </a>
                         <ul class="nav nav-second-level">
                             <li>
+                                <a class="J_menuItem" href="{{route('statistics.billquery')}}">新交易订单</a>
+                            </li>
+                            <li>
                                 <a class="J_menuItem" href="{{url('admin/alipayopen/neworderlist')}}">交易订单</a>
                             </li>
                             {{--@permission('userprofit')--}}
@@ -175,7 +178,9 @@
                             <li>
                                 <a class="J_menuItem" href="{{route('upstorelst')}}">银联钱包商户</a>
                             </li>
-
+                            <li>
+                                <a class="J_menuItem" href="{{route('bestpay.index')}}">翼支付商户</a>
+                            </li>
                         </ul>
                     </li>
                     <li>
@@ -245,9 +250,14 @@
                                 <a class="J_menuItem" href="{{route("updateAppIndex")}}">APP更新</a>
                             </li>
                             @endpermission
+                            {{--<li>--}}
+                                {{--<a class="J_menuItem" href="{{route("paipailst")}}">易锐派派盒子</a>--}}
+                            {{--</li>--}}
+                            @role('admin')
                             <li>
-                                <a class="J_menuItem" href="{{route("paipailst")}}">易锐派派盒子</a>
+                                <a class="J_menuItem" href="{{route("paipaiindex")}}">易锐派派盒子</a>
                             </li>
+                            @endrole
                         </ul>
                     </li>
 

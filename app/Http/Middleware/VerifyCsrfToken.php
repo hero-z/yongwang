@@ -39,6 +39,6 @@ class VerifyCsrfToken extends BaseVerifier
         'admin/webank/ali_callback',
         'admin/webank/wx_callback',
         'up/notice',
-
+        'bestpay/mpayback',
     ];
 }

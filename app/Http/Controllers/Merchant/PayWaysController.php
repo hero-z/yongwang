@@ -46,7 +46,7 @@ class PayWaysController extends BaseController
     public function setWaysPost(Request $request)
     {
         $data = $request->except(['_token']);
-        if ($data['alipay'] == "" && $data['weixin'] == "" && $data['jd'] == "") {
+        if ($data['alipay'] == "" && $data['weixin'] == "" && $data['jd'] == ""&&$data['bestpay'] == "" ) {
             return json_encode(['status' => 0, 'msg' => '保存失败']);
         }
         $data['merchant_id'] = auth()->guard('merchant')->user()->id;

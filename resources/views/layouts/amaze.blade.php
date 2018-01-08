@@ -256,17 +256,26 @@
                 </ul>
             </li>
             <li class="sidebar-nav-link">
+                <a href="{{route('bestpay.merchantquery')}}">
+                    <i class="am-icon-modx sidebar-nav-link-logo"></i> 翼支付流水
+                </a>
+            </li>
+            <li class="sidebar-nav-link">
                 <a href="javascript:;" class="sidebar-nav-sub-title">
                     <i class="am-icon-qrcode sidebar-nav-link-logo"></i> 账单管理
                     <span class="am-icon-chevron-down am-fr am-margin-right-sm sidebar-nav-sub-ico"></span>
                 </a>
                 <ul class="sidebar-nav sidebar-nav-sub">
                     <li class="sidebar-nav-link">
+                        <a href="{{route('statistics.merchantbillquery')}}">
+                            <span class="am-icon-angle-right sidebar-nav-link-logo"></span>新账单统计
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-link">
                         <a href="{{route('neworderlists')}}">
                             <span class="am-icon-angle-right sidebar-nav-link-logo"></span>账单统计
                         </a>
                     </li>
-
                     {{--<li class="sidebar-nav-link">--}}
                         {{--<a href="{{route('alipaysLs')}}">--}}
                             {{--<span class="am-icon-angle-right sidebar-nav-link-logo"></span>平安自主对账--}}

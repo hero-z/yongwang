@@ -1041,14 +1041,38 @@ Route::group(['namespace' => 'Union', 'prefix' => 'upstore', 'middleware' => 'au
     Route::any('edit',"StoreController@edit")->name('upstoreedit');
 
 });
+//翼支付
+Route::group(['namespace' => 'BestPay', 'prefix' => 'bestpay', 'middleware' => 'auth'], function () {
 
+    Route::any('test',"ManageController@test")->name('bestpay.test');
+    Route::any('index',"ManageController@index")->name('bestpay.index');
+    Route::any('add',"ManageController@add")->name('bestpay.add');
+    Route::post('del',"ManageController@del")->name('bestpay.del');
+    Route::any('query',"ManageController@query")->name('bestpay.query');
 
+});
+Route::group(['namespace' => 'BestPay', 'prefix' => 'bestpay'], function () {
+    Route::post('mpayback',"NotifyController@mPayBack")->name('bestpay.mpayback');
 
+});
+Route::group(['namespace' => 'Statistics', 'prefix' => 'statistics', "middleWare" => "auth"], function () {
+    Route::any('billquery',"ManageController@billQuery")->name('statistics.billquery');
+
+});
+Route::group(['namespace' => 'Statistics', 'prefix' => 'statistics', "middleWare" => "auth.merchant"], function () {
+    Route::any('merchant/billquery',"MerchantManageController@billQuery")->name('statistics.merchantbillquery');
+    //翼支付流水
+    Route::get('/bestpay/query',"MerchantManageController@query")->name('bestpay.merchantquery');
+});
 //设备管理
 Route::group(["namespace" => "Yirui", "prefix" => "admin/yirui", "middleWare" => "auth"], function () {
-    Route::any("paipai/lst", "PaipaiController@lst")->name("paipailst");
-    Route::any("paipai/add", "PaipaiController@add")->name("paipaiadd");
+//    Route::any("paipai/lst", "PaipaiController@lst")->name("paipailst");
+//    Route::any("paipai/add", "PaipaiController@add")->name("paipaiadd");
     Route::any("paipai/storemerchant", "PaipaiController@storeMerchant")->name("paipaistoremerchant");
+    //重写派派盒子管理
+    Route::any("paipai/index", "ManageController@index")->name("paipaiindex");
+    Route::post("paipai/del", "ManageController@del")->name("paipaidel");
+    Route::any("paipai/add", "ManageController@add")->name("paipaiadd");
 
 
 });
